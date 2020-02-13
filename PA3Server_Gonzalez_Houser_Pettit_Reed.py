@@ -3,6 +3,10 @@
 
 # placeholder code below
 from socket import *
+from socket import socket
+from _thread import *
+import threading
+
 serverPort = 12000
 
 # Create a TCP socket
@@ -10,11 +14,18 @@ serverPort = 12000
 serverSocket = socket(AF_INET,SOCK_STREAM)
 
 # Assign IP address and port number to socket
-serverSocket.bind(('',serverPort)) serverSocket.listen(1)
+serverSocket.bind(('',serverPort)) 
+serverSocket.listen(1)
 print ('The server is ready to receive')
+
 while True:
     connectionSocket, addr = serverSocket.accept()
-    sentence = connectionSocket.recv(1024).decode()
-    capitalizedSentence = sentence.upper()
+    sentence1 = connectionSocket.recv(1024).decode()
+    #sentence2 = connectionSocket.recv(1024).decode()
+    #capitalizedSentence = sentence1 + 'received before' + sentence2
+    capitalizedSentence = sentence1 + ' received before '
+
     connectionSocket.send(capitalizedSentence.encode())
     connectionSocket.close()
+
+    print('Sent acknowledgement to both X and Y')
