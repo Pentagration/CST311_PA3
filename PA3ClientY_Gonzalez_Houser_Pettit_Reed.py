@@ -16,7 +16,6 @@ clientSocket.connect((serverName,serverPort))
 sentence = 'Client Y: Bob'
 
 # send message to server
-clientSocket.send
 clientSocket.send(sentence.encode())
 
 # indicate that the message has been sent to the server
