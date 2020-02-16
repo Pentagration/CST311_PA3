@@ -1,0 +1,43 @@
+from socket import *
+from socket import socket
+import threading
+import concurrent.futures
+import time
+
+class ClientThreads:
+    def __init__(self):
+        self.message = list()
+        self._lock = threading.Lock()
+
+    def update(self, index):
+        connectionSocket, addr = serverSocket.accept()
+        sentence = connectionSocket.recv(1024).decode()
+        with self._lock:
+            local_message = self.message
+            local_message.append(sentence)
+            self.message = local_message
+        print(self.message)
+
+if __name__ == "__main__":
+    ### START SERVER SETUP
+    #Assign TCP port number
+    serverPort = 12000
+
+    # Create a TCP socket
+    # Notice the use of SOCK_STREAM for TCP packets
+    serverSocket = socket(AF_INET,SOCK_STREAM)
+
+    #Assign IP address and port number to socket
+    serverSocket.bind(('',serverPort))
+    serverSocket.listen(1)
+    print('The server is ready to receive')
+    ### END SERVER SETUP
+
+while True:
+    client = ClientThreads()
+    test = 1
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        for index in range(2):
+            executor.submit(client.update, index)
+
