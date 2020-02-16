@@ -16,7 +16,7 @@ clientSocket.connect((serverName,serverPort))
 sentence = 'Client Y: Bob'
 
 # put in a wait so we can determine which client actually sends first regardless of connection order
-input("Press Enter to send message to server")
+raw_input("Press Enter to send message to server")
 
 # send message to server
 clientSocket.send(sentence.encode())
