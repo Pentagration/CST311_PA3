@@ -10,13 +10,22 @@ class ClientThreads:
         self._lock = threading.Lock()
 
     def update(self, index):
-        connectionSocket, addr = serverSocket.accept()
-        sentence = connectionSocket.recv(1024).decode()
+        connectionSocket, addr = serverSocket.accept()  # connect to client
+        sockets.append(connectionSocket)                # list of clients
+        sentence = connectionSocket.recv(1024).decode() # from client sentence is either Client X: Alice or Client Y: Bob
+
         with self._lock:
-            local_message = self.message
-            local_message.append(sentence)
-            self.message = local_message
+            local_message = self.message                # initially an empty list
+            local_message.append(sentence)              # append the sentence from the client
+            self.message = local_message                # store the updated list in self.message list
+
+        #SO I CAN GET THE SERVER TO OUTPUT THE LIST HERE
+        #THIS INDICATES TO ME THAT WE HAVE NO EXITED THIS FUNCTION YET
         print(self.message)
+
+        #SEEMS LIKE WE SHOULD BE ABLE TO HAVE AN IF STATEMENT HERE
+        if len(self.message) == 2:
+            print(self.message[1] + ' received  before ' + self.message[2])
 
 if __name__ == "__main__":
     ### START SERVER SETUP
@@ -34,10 +43,28 @@ if __name__ == "__main__":
     ### END SERVER SETUP
 
 while True:
+    numClients = 2
+    sockets = list()
     client = ClientThreads()
-    test = 1
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        for index in range(2):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=numClients) as executor:
+        for index in range(numClients):
             executor.submit(client.update, index)
 
+#BELOW STILL WORKS FINE IF UNCOMMENTED
+#I JUST FEEL LIKE WE SHOULD BE ABLE TO USE client.message[i] to construct the message
+#SO THAT IF WE HAD MORE THAN TO CLIENTS IT WOULD STILL WORK
+#SOMETHING LIKE
+#client.message[1] + 'arrived before' + client.message[2] + 'arrived before' + client.message[3]
+"""
+    for i in sockets:
+        if client.message[0] == "Client X: Alice":
+            returnSentence = "X: Alice received before Y: Bob"
+        elif client.message[0] == "Client Y: Bob":
+            returnSentence = "Y: Bob received before X: Alice"
+        else:
+            returnSentence = "Something weird happened"
+        i.send(returnSentence.encode())
+        i.close()
+    print(returnSentence)
+"""
