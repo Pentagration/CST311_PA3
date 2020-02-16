@@ -7,6 +7,7 @@ def thread_accept(index, message, lock, sockets):
     sockets.append(connectionSocket)                # store client sockets
     #lock.acquire()                                  # acquire a lock to prevent simultaneous writes to message
     sentence = connectionSocket.recv(1024).decode() # sentence = Client X: Alice or Client Y: Bob
+    print('Received from client: ' + sentence)
     message.append(sentence)                        # keep track of which sentence arrived first
     #lock.release()                                  # release the lock
 # START SERVER SETUP
@@ -44,3 +45,4 @@ while True:
             returnSentence = "Something weird happened"
         i.send(returnSentence.encode())
         i.close()
+    print(returnSentence)
