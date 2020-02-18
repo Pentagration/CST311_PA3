@@ -1,15 +1,17 @@
 from socket import *
 from socket import socket
 import threading
+
+# threading needed to allow the server program to host multiple connections 
+# simultaneously as opposed to sequentially
 # Thread function
 def thread_accept(index, message, lock, sockets):
     connectionSocket, addr = serverSocket.accept()  # accept a client connection
     sockets.append(connectionSocket)                # store client sockets
-    #lock.acquire()                                  # acquire a lock to prevent simultaneous writes to message
     sentence = connectionSocket.recv(1024).decode() # sentence = Client X: Alice or Client Y: Bob
     print('Received from client: ' + sentence)
-    message.append(sentence)                        # keep track of which sentence arrived first
-    #lock.release()                                  # release the lock
+    with lock:                                      # use a lock to prevent simultaneous writes to message
+        message.append(sentence)                    # keep track of which sentence arrived first
 # START SERVER SETUP
 #Assign TCP port number
 serverPort = 12000
@@ -36,13 +38,11 @@ while True:
         thread.join()
     print('Sent acknowledgement to both X and Y')
 
+    # return message to all clients of which sent message before which
+    # opted to use the same list of messages stored for ease of expansion beyond 2
     for i in sockets:
-        if message[0] == "Client X: Alice":
-            returnSentence = "X: Alice received before Y: Bob"
-        elif message[0] == "Client Y: Bob":
-            returnSentence = "Y: Bob received before X: Alice"
-        else:
-            returnSentence = "Something weird happened"
-        i.send(returnSentence.encode())
+        for j in range(0, len(message)-1):
+            returnSentence = message[j] + " received before " + message[j+1]
+            i.send(returnSentence.encode())
         i.close()
     print(returnSentence)

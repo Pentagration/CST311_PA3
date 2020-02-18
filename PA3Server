@@ -1,7 +1,7 @@
 from socket import *
 from socket import socket
 import threading
-import concurrent.futures
+#import concurrent.futures
 import time
 
 class ClientThreads:
@@ -50,6 +50,13 @@ while True:
     with concurrent.futures.ThreadPoolExecutor(max_workers=numClients) as executor:
         for index in range(numClients):
             executor.submit(client.update, index)
+
+    for i in sockets:
+        for j in range(0, len(client.message)-1):
+            returnSentence = client.message[j] + " received before " + client.message[j+1]
+            i.send(returnSentence.encode())
+        i.close()
+    print(returnSentence)
 
 #BELOW STILL WORKS FINE IF UNCOMMENTED
 #I JUST FEEL LIKE WE SHOULD BE ABLE TO USE client.message[i] to construct the message
